@@ -20,8 +20,19 @@ void swap(int &a, int &b){
 	b = tmp;
 }
 
+int getMaxValue(vector<int> &arr){
+	int length = arr.size(), max;
+	max = arr[0];
+	for(int i = 1; i < length; i++){
+		if(arr[i] > max){
+			max = arr[i];
+		}
+	}
+	return max;
+}
+
 int dataLength; bool isManualInput = false;
-int MAX_RAND = 10; //SET MAX VALUE FOR TO BE GENERATED IN RANDOM DATA
+int MAX_RAND = 27; //SET MAX VALUE FOR TO BE GENERATED IN RANDOM DATA
 
 int main(int argc, char **argv)
 {
@@ -109,7 +120,6 @@ int main(int argc, char **argv)
 
 /* LIST OF SORTING FUNCTIONS *
  * ------------------------- */
-
 void bubbleSort(vector<int> &data){
 	int lastUnsortedElement = dataLength - 1;
 	bool swapped = false;
@@ -173,7 +183,22 @@ void r_quickSort(vector<int> &data){
 }
 
 void countSort(vector<int> &data){
+	int length = dataLength;
+	int maxRange = getMaxValue(data) + 1;
+	vector<int> counter(maxRange);
 	
+	for(int i = 0; i < length; i++){
+		counter[data[i]]++;
+	}
+	
+	int dataIndex = 0;
+	for(int i = 0; i < maxRange; i++){
+		while(counter[i] > 0){
+			data[dataIndex] = i;
+			counter[i]--;
+			dataIndex++;
+		}
+	}
 }
 
 void radixSort(vector<int> &data){
