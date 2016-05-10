@@ -9,7 +9,7 @@ void bubbleSort(vector<int> &data);
 void selectSort(vector<int> &data);
 void insertSort(vector<int> &data);
 void mergeSort(vector<int> &data);
-void quickSort(vector<int> &data);
+void quickSort(vector<int> &data,int upper,int lower);
 void r_quickSort(vector<int> &data);
 void countSort(vector<int> &data);
 void radixSort(vector<int> &data);
@@ -93,7 +93,7 @@ int main(int argc, char **argv)
 			mergeSort(data);
 			break;
 		case 5:
-			quickSort(data);
+			quickSort(data,dataLength-1,0);
 			break;
 		case 6:
 			r_quickSort(data);
@@ -174,8 +174,36 @@ void mergeSort(vector<int> &data){
 	
 }
 
-void quickSort(vector<int> &data){
+void quickSort(vector<int> &data,int upper,int lower){
+	int pivot=upper;
+	int i=upper-1;
+	int j=lower;
 	
+	if(i > j){
+		while(i > j){
+			while(data[i] >= data[pivot] && i >= j){
+				i--;
+			}
+			while(data[j] < data[pivot] && j <= i){
+				j++;
+			}
+			if(i > j){
+				swap(data[i],data[j]);
+			}else if(j > i){
+				swap(data[j],data[pivot]);
+			}
+		}
+	}else if(i==j && data[i]>data[pivot]){
+		swap(data[i],data[pivot]);
+	}
+	
+	if(j-1>lower){
+		quickSort(data,j-1,lower);
+	}
+	if(i+2<upper){
+		quickSort(data,upper,i+2);
+	}
+	return;
 }
 
 void r_quickSort(vector<int> &data){
