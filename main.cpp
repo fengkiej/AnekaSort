@@ -197,10 +197,10 @@ void quickSort(vector<int> &data,int upper,int lower){
 		swap(data[i], data[pivot]);
 	}
 	
-	if(j-1>lower){
+	if(j - 1 > lower){
 		quickSort(data, j-1, lower);
 	}
-	if(i+2<upper){
+	if(i + 2 < upper){
 		quickSort(data, upper, i+2);
 	}
 }
