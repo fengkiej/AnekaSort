@@ -8,8 +8,9 @@ using namespace std;
 void bubbleSort(vector<int> &data);
 void selectSort(vector<int> &data);
 void insertSort(vector<int> &data);
-void mergeSort(vector<int> &data);
-void quickSort(vector<int> &data, int upper, int lower);
+void mergeSort(vector<int> &data, int lower, int upper);
+void quickSort_1(vector<int> &data, int lower, int upper);
+void quickSort_2(vector<int> &data, int lower, int upper);
 void r_quickSort(vector<int> &data);
 void countSort(vector<int> &data);
 void radixSort(vector<int> &data);
@@ -32,7 +33,8 @@ int getMaxValue(vector<int> &arr){
 }
 
 int dataLength; bool isManualInput = false;
-int MAX_RAND = 27; //SET MAX VALUE FOR TO BE GENERATED IN RANDOM DATA
+int MAX_RAND = 30; //SET MAX VALUE FOR TO BE GENERATED IN RANDOM DATA
+int compareCount = 0;
 
 int main(int argc, char **argv)
 {
@@ -62,10 +64,11 @@ int main(int argc, char **argv)
 		 << "2. Selection Sort\n"
 		 << "3. Insertion Sort\n"
 		 << "4. Merge Sort\n"
-		 << "5. Quick Sort\n"
-		 << "6. R-Quick Sort\n"
-		 << "7. Counting Sort\n"
-		 << "8. Radix Sort\n";
+		 << "5. Quick Sort 1\n"
+		 << "6. Quick Sort 2\n"
+		 << "7. R-Quick Sort\n"
+		 << "8. Counting Sort\n"
+		 << "9. Radix Sort\n";
 	
 	//ask for user choice, valid input: 1-8
 	int q; bool is_qValid = false;
@@ -90,18 +93,21 @@ int main(int argc, char **argv)
 			insertSort(data);
 			break;
 		case 4:
-			mergeSort(data);
+			mergeSort(data, 0, dataLength - 1);
 			break;
 		case 5:
-			quickSort(data, dataLength - 1, 0);
+			quickSort_1(data, 0, dataLength);
 			break;
 		case 6:
-			r_quickSort(data);
+			quickSort_2(data, 0, dataLength);
 			break;
 		case 7:
-			countSort(data);
+			r_quickSort(data);
 			break;
 		case 8:
+			countSort(data);
+			break;
+		case 9:
 			radixSort(data);
 			break;
 		default:
@@ -115,6 +121,8 @@ int main(int argc, char **argv)
 	}
 	
 	cout << endl;
+	
+	cout << "Number of comparison: " << compareCount << endl;
 	return 0;
 }
 
@@ -130,6 +138,7 @@ void bubbleSort(vector<int> &data){
 			if(data[i] > data[i+1]){
 				swap(data[i], data[i+1]);
 				swapped = true;
+				compareCount++;
 			}
 		}
 		
@@ -147,6 +156,7 @@ void selectSort(vector<int> &data){
 			if(data[j] < data[min]){
 				min = j;
 			}
+			compareCount++;
 		}
 		
 		swap(data[min], data[firstUnsortedIndex]);
@@ -163,6 +173,7 @@ void insertSort(vector<int> &data){
 			if(data[curIndex] < data[j]){
 				swap(data[curIndex], data[j]);
 				curIndex = j;
+				compareCount++;
 			} else {
 				break;
 			}
@@ -170,39 +181,96 @@ void insertSort(vector<int> &data){
 	}
 }
 
-void mergeSort(vector<int> &data){
+void merge(vector<int> &data, int lower, int mid, int upper){
+	vector<int> tmp;
+	int leftIndex = lower;
+	int rightIndex = mid + 1; 
 	
+	//Compare and merge
+	while(leftIndex <= mid && rightIndex <= upper){
+		if(data[leftIndex] < data[rightIndex]){
+			tmp.push_back(data[leftIndex++]);
+		} else {
+			tmp.push_back(data[rightIndex++]);
+		}
+		compareCount++;
+	}
+	
+	//Put back remaining elements
+	while(leftIndex <= mid){
+		tmp.push_back(data[leftIndex++]);
+	}
+	
+	while(rightIndex <= upper){
+		tmp.push_back(data[rightIndex++]);
+	}
+	
+	//Copy elements back
+	for(int i = 0; i < tmp.size(); i++){
+		data[lower++] = tmp[i];
+	}
 }
 
-void quickSort(vector<int> &data,int upper,int lower){
-	int pivot = upper;
-	int i = upper - 1;
-	int j = lower;
+void mergeSort(vector<int> &data, int lower, int upper){
+	int mid = (lower + upper)/2;
 	
-	if(i > j){
-		while(i > j){
-			while(data[i] >= data[pivot] && i >= j){
-				i--;
-			}
-			while(data[j] < data[pivot] && j <= i){
-				j++;
-			}
-			if(i > j){
-				swap(data[i], data[j]);
-			} else if(j > i){
-				swap(data[j], data[pivot]);
-			}
+	if(lower < upper){
+		mergeSort(data, lower, mid);
+		mergeSort(data, mid + 1, upper);
+		
+		merge(data, lower, mid, upper);
+	} else return;
+}
+
+void quickSort_1(vector<int> &data, int lower, int upper){
+ 	int pivot = upper;
+ 	int i = upper - 1;
+ 	int j = lower;
+ 	
+ 	if(i > j){
+ 		while(i > j){
+ 			while(data[i] >= data[pivot] && i >= j){
+ 				i--;
+ 			}
+ 			while(data[j] < data[pivot] && j <= i){
+ 				j++;
+ 			}
+
+ 			if(i > j){
+ 				swap(data[i], data[j]);
+ 			} else if(j > i){
+ 				swap(data[j], data[pivot]);
+ 			}
+			//compareCount++;
+ 		}
+ 	} else if(i == j && data[i] > data[pivot]){
+ 		swap(data[i], data[pivot]);
+ 	}
+ 	
+ 	if(j-1 > lower){
+ 		quickSort_1(data, lower, j-1);
+ 	}
+ 	if(i+2 < upper){
+ 		quickSort_1(data, i+2, upper);
+ 	}
+}
+
+void quickSort_2(vector<int> &data, int lower, int upper){
+	int pivot = lower;
+	int swapIndex = pivot + 1;
+	
+	for(int i = swapIndex; i < upper; i++){
+		if(data[i] < data[pivot]){
+			swap(data[i], data[swapIndex]);
+			swapIndex++;
 		}
-	} else if(i == j && data[i] > data[pivot]){
-		swap(data[i], data[pivot]);
+		compareCount++;
 	}
+	swapIndex--;
+	swap(data[pivot], data[swapIndex]);
 	
-	if(j - 1 > lower){
-		quickSort(data, j-1, lower);
-	}
-	if(i + 2 < upper){
-		quickSort(data, upper, i+2);
-	}
+	if(swapIndex > lower) quickSort_2(data, lower, swapIndex);
+	if(swapIndex + 1 < upper) quickSort_2(data, swapIndex + 1, upper);
 }
 
 void r_quickSort(vector<int> &data){
